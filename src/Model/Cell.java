@@ -1,40 +1,7 @@
 package Model;
 
-enum InsideOfCell{
-    CHIP_BLACK,
-    CHIP_WHITE,
-    EMPTY;
-
-    @Override
-    public String toString() {
-        if(this == CHIP_BLACK){
-            return "B";
-        }
-        if(this == CHIP_WHITE){
-            return "W";
-        }
-        return " ";
-    }
-}
-
-enum TypeOfChip{
-    CHIP_BLACK,
-    CHIP_WHITE,
-    EMPTY;
-
-    public String toString() {
-        if(this == CHIP_BLACK){
-            return "B";
-        }
-        if(this == CHIP_WHITE){
-            return "W";
-        }
-        return " ";
-    }
-}
-
 public class Cell {
-    TypeOfChip insideOfCell;
+    private TypeOfChip insideOfCell;
 
     public void setInsideOfCell(TypeOfChip insideOfCell) {
         this.insideOfCell = insideOfCell;
