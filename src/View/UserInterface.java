@@ -10,20 +10,26 @@ public class UserInterface {
     public Coordinates askCoordinates() {
         System.out.printf("Введите координаты вашего хода (например: '1a'): ");
         String answer = in.nextLine();
-        if (!isCorrectCoordinates(answer)) {
-            System.out.printf("Некорректный ввод попробуйте еще раз)");
-        } else {
-            System.out.println("Молодец");
+        Coordinates coordinates;
+        while(true){
+            if (!isCorrectCoordinates(answer)) {
+                System.out.println("Некорректный ввод попробуйте еще раз)");
+                System.out.printf("Введите координаты вашего хода (например: '1a'): ");
+                answer = in.nextLine();
+            } else {
+                coordinates = transformToCoordinates(answer);
+
+            }
         }
-        return new Coordinates();
+
     }
 
-    private boolean isCorrectCoordinates(String coordinates) {
-        if (coordinates.length() != 2) {
+    private boolean isCorrectCoordinates(String strCoordinates) {
+        if (strCoordinates.length() != 2) {
             return false;
         }
-        char i = coordinates.charAt(0);
-        char j = coordinates.charAt(1);
+        char i = strCoordinates.charAt(0);
+        char j = strCoordinates.charAt(1);
         if (!(i >= '1' && i <= '8')) {
             return false;
         }
@@ -32,4 +38,11 @@ public class UserInterface {
         }
         return true;
     }
+
+    private Coordinates transformToCoordinates(String strCoordinates) {
+        int i = strCoordinates.charAt(0) - '1';
+        int j = strCoordinates.charAt(1) - 'a';
+        return new Coordinates(i, j);
+    }
+
 }

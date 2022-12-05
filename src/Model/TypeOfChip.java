@@ -1,6 +1,6 @@
 package Model;
 
-enum TypeOfChip{
+public enum TypeOfChip{
     CHIP_BLACK,
     CHIP_WHITE,
     EMPTY;
