@@ -4,6 +4,8 @@ import Model.Board;
 import Model.TypeOfChip;
 import View.UserInterface;
 
+import java.util.ArrayList;
+
 public class Game {
     UserInterface userInterface;
     Board board;
@@ -11,19 +13,45 @@ public class Game {
     // кто сейчас ходит
     TypeOfChip turnUser;
 
-    public Game(){
+    ArrayList<Coordinates> cellsPossiblePutChips;
+
+    public Game() {
         userInterface = new UserInterface();
         board = new Board();
         turnUser = TypeOfChip.CHIP_BLACK;
-
     }
-    public void play(){
-        board.updatePossibilityBoard(turnUser);
-        board.printBoard();
-        userInterface.askCoordinates();
+    public ArrayList<Coordinates> getCellsPossiblePutChips() {
+        return cellsPossiblePutChips;
     }
 
-    public boolean isPossiblePutChip(){
-        return true;
+    public TypeOfChip getTurnUser() {
+        return turnUser;
+    }
+
+    public void play() {
+        Coordinates coordinates;
+
+        while (true) {
+            board.updatePossibilityBoard(turnUser);
+            board.printBoard();
+            cellsPossiblePutChips =  board.getCellsPossiblePutChips(turnUser);
+            if(cellsPossiblePutChips.size() == 0){
+                userInterface.printGoodbue();
+                break;
+            }
+            coordinates = userInterface.askCoordinates(this);
+            board.putChip(turnUser, coordinates.i, coordinates.j);
+            changeTurnUser();
+        }
+    }
+
+
+
+    public boolean isPossiblePutChip(Coordinates coordinates) {
+        return board.isPossiblePutChip(turnUser, coordinates.i, coordinates.j);
+    }
+
+    private void changeTurnUser(){
+        turnUser = turnUser.getOpponent();
     }
 }

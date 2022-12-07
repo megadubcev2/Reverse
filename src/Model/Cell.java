@@ -3,6 +3,10 @@ package Model;
 public class Cell {
     private TypeOfChip insideOfCell;
 
+    public Cell() {
+        insideOfCell = TypeOfChip.EMPTY;
+    }
+
     public void setInsideOfCell(TypeOfChip insideOfCell) {
         this.insideOfCell = insideOfCell;
     }
@@ -45,9 +49,11 @@ public class Cell {
         throw new RuntimeException("Неправильный цвет игрока");
     }
 
-    public Cell() {
-        insideOfCell = TypeOfChip.EMPTY;
+    public void changeChip(){
+        insideOfCell = insideOfCell.getOpponent();
     }
+
+
 
     @Override
     public String toString() {

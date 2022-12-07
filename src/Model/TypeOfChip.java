@@ -14,4 +14,14 @@ public enum TypeOfChip{
         }
         return " ";
     }
+
+    public TypeOfChip getOpponent(){
+        if(this == CHIP_BLACK){
+            return CHIP_WHITE;
+        }
+        if(this == CHIP_WHITE){
+            return CHIP_BLACK;
+        }
+        throw new RuntimeException("Неправильный цвет игрока");
+    }
 }
