@@ -1,10 +1,9 @@
 import Controller.Game;
+import Controller.Menu;
 
 public class Main {
     public static void main(String[] args) {
-        var game = new Game();
-        game.play();
+        var menu = new Menu();
+        menu.begin();
     }
-
-
 }

@@ -2,9 +2,9 @@ package Model;
 
 import Controller.Coordinates;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.List;
+
+import static Model.TypeOfCoordinates.getTypeOfCoordinates;
 
 public class Board {
     final int len = 8;
@@ -32,12 +32,17 @@ public class Board {
         System.out.println();
     }
 
-    private void printLine(int line) {
+    private void printLine(int line, boolean showPossibleCells) {
         System.out.printf(line + 1 + " ");
         for (int i = 0; i < len; i++) {
-            System.out.format("|  %s  ", table[line][i].toString());
+            if (showPossibleCells) {
+                System.out.format("|  %s  ", table[line][i].toString());
+            } else {
+                // выводит только что находится
+                System.out.format("|  %s  ", table[line][i].getInsideOfCell().toString());
+            }
         }
-        System.out.println("|");
+        System.out.printf("|");
     }
 
     private void printLineOfLetters() {
@@ -48,11 +53,26 @@ public class Board {
         System.out.println();
     }
 
-    public void printBoard() {
+    private void printNumberChips(TypeOfChip color) {
+        if (color == TypeOfChip.CHIP_BLACK) {
+            System.out.printf("   Черных фишек: ");
+        } else if (color == TypeOfChip.CHIP_WHITE) {
+            System.out.printf("   Белых фишек: ");
+        }
+        System.out.printf(Integer.toString(countChipsByColor(color)));
+    }
+
+    public void printBoard(boolean showPossibleCells) {
         printLineOfLetters();
         for (int i = 0; i < len; i++) {
             printPartition();
-            printLine(i);
+            printLine(i, showPossibleCells);
+            if (i == 3) {
+                printNumberChips(TypeOfChip.CHIP_BLACK);
+            } else if (i == 4) {
+                printNumberChips(TypeOfChip.CHIP_WHITE);
+            }
+            System.out.println();
         }
         printPartition();
     }
@@ -139,7 +159,7 @@ public class Board {
 
     public void putChip(TypeOfChip turnUser, int i, int j) {
         table[i][j].setInsideOfCell(turnUser);
-        changeClosedChips(turnUser,i, j);
+        changeClosedChips(turnUser, i, j);
     }
 
     private void changeChip(int i, int j) {
@@ -169,20 +189,101 @@ public class Board {
         }
     }
 
-    public ArrayList<Coordinates> getCellsPossiblePutChips(TypeOfChip turnUser){
+    public ArrayList<Coordinates> getCellsPossiblePutChips(TypeOfChip turnUser) {
         ArrayList<Coordinates> cellsPossiblePutChips = new ArrayList<Coordinates>();
         for (int i = 0; i < len; i++) {
             for (int j = 0; j < len; j++) {
-                if(table[i][j].getPossiblePutChip(turnUser)){
-                    cellsPossiblePutChips.add(new Coordinates(i,j));
+                if (table[i][j].getPossiblePutChip(turnUser)) {
+                    cellsPossiblePutChips.add(new Coordinates(i, j));
                 }
             }
         }
         return cellsPossiblePutChips;
     }
 
+    public int countChipsByColor(TypeOfChip color) {
+        int numberChips = 0;
+
+        for (int i = 0; i < len; i++) {
+            for (int j = 0; j < len; j++) {
+                if (table[i][j].getInsideOfCell() == color) {
+                    numberChips++;
+                }
+            }
+        }
+        return numberChips;
+    }
+
+    public Coordinates chooseBestStep(TypeOfChip turnUser) {
+        double maxValye = -1;
+        Coordinates maxCoordinates = new Coordinates(0, 0);
+
+        double value;
+        for (int i = 0; i < len; i++) {
+            for (int j = 0; j < len; j++) {
+                if (table[i][j].getPossiblePutChip(turnUser)) {
+                    value = getValue(i, j, turnUser);
+                    if (value > maxValye) {
+                        maxValye = value;
+                        maxCoordinates = new Coordinates(i, j);
+                    }
+                }
+            }
+        }
+        //System.out.println(maxValye);
+        return maxCoordinates;
+    }
+
+    private double getValue(int i, int j, TypeOfChip turnUser) {
+        double value = getMainValue(i, j);
+
+        for (int k = -1; k < 2; k++) {
+            for (int l = -1; l < 2; l++) {
+                if (k == 0 && l == 0) {
+                    continue;
+                }
+                value += getValueByVector(i, j, turnUser, k, l);
+            }
+        }
+
+        return value;
+    }
+
+    private double getValueByVector(int i, int j, TypeOfChip turnUser, int shifti, int shiftj) {
+        double value = 0;
+
+        while (true) {
+            i += shifti;
+            j += shiftj;
+            if (!Coordinates.existCoordinates(i, j)) {
+                return 0;
+            }
+            if (table[i][j].getInsideOfCell() == TypeOfChip.EMPTY) {
+                return 0;
+            }
+            if (table[i][j].getInsideOfCell() == turnUser) {
+                return value;
+            }
+            value += getClosedValue(i, j);
+        }
+    }
+
+    private double getMainValue(int i, int j) {
+        if (getTypeOfCoordinates(i, j) == TypeOfCoordinates.CORNER) {
+            return 0.8;
+        }
+        if (getTypeOfCoordinates(i, j) == TypeOfCoordinates.BOUNDARY) {
+            return 0.4;
+        }
+        return 0;
+    }
+
+    private double getClosedValue(int i, int j) {
+        if (getTypeOfCoordinates(i, j) == TypeOfCoordinates.BOUNDARY) {
+            return 2;
+        }
+        return 1;
+    }
+
+
 }
-
-
-
-
